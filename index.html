@@ -109,6 +109,22 @@ const music = document.getElementById("bgMusic");
 let escapeCount = 0;
 const MAX_ESCAPE = 15;
 
+const phrases = [
+  "Pakad ke dikha",
+  "Nahi milega",
+  "Try again"
+];
+
+// 🎤 Speak function
+function speak(text) {
+  const msg = new SpeechSynthesisUtterance(text);
+  msg.lang = "en-IN";
+  msg.rate = 1;
+  msg.pitch = 1.2;
+  speechSynthesis.cancel(); // overlapping stop
+  speechSynthesis.speak(msg);
+}
+
 // Center buttons
 function centerButtons() {
   yesBtn.style.left = (window.innerWidth / 2 - 120) + "px";
@@ -132,7 +148,7 @@ function createHeart() {
 }
 setInterval(createHeart, 400);
 
-// NO button movement + talking
+// NO button movement + voice
 function moveNoButton() {
   if (escapeCount >= MAX_ESCAPE) {
     noBtn.style.left = "-500px";
@@ -142,22 +158,25 @@ function moveNoButton() {
 
   escapeCount++;
 
+  const text = phrases[Math.floor(Math.random() * phrases.length)];
+  noBtn.innerText = text;
+  speak(text);
+
   const x = Math.random() * (window.innerWidth - noBtn.offsetWidth);
   const y = Math.random() * (window.innerHeight - noBtn.offsetHeight);
 
   noBtn.style.left = x + "px";
   noBtn.style.top = y + "px";
-  noBtn.innerText = ["Pakad ke dikha 😜", "Nahi milega 😆", "Try again 😝"][Math.floor(Math.random()*3)];
 }
 
 noBtn.addEventListener("mouseover", moveNoButton);
 noBtn.addEventListener("click", moveNoButton);
 
-// YES button fireworks + music
+// YES button fireworks
 yesBtn.addEventListener("click", () => {
   music.play();
 
-  for (let i = 0; i < 120; i++) {
+  for (let i = 0; i < 150; i++) {
     const fire = document.createElement("div");
     fire.className = "firework";
 
