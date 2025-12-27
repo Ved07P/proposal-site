@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Proposal ❤️</title>
+
 <style>
   body {
     margin: 0;
@@ -16,11 +17,10 @@
     font-family: "Segoe UI Emoji", "Apple Color Emoji", Arial, sans-serif;
     background: linear-gradient(135deg, #ff9a9e, #fad0c4);
     overflow: hidden;
-    position: relative;
   }
 
   h1 {
-    margin-top: 50px;
+    margin-top: 40px;
     font-size: 3rem;
     text-align: center;
   }
@@ -28,7 +28,7 @@
   .button-container {
     position: relative;
     width: 100%;
-    height: 150px; /* heading ke niche space */
+    height: 180px;
     margin-top: 20px;
   }
 
@@ -39,7 +39,7 @@
     border-radius: 10px;
     cursor: pointer;
     position: absolute;
-    transition: all 0.2s ease;
+    transition: all 0.25s ease;
   }
 
   #yes {
@@ -52,21 +52,41 @@
     color: white;
   }
 
-  /* Fireworks particle */
-  .firework {
+  /* 🔥 Floating Hearts */
+  .heart {
     position: absolute;
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    animation: fall 1.5s linear forwards;
+    font-size: 24px;
+    animation: float 6s linear infinite;
+    opacity: 0.8;
   }
 
-  @keyframes fall {
+  @keyframes float {
+    0% {
+      transform: translateY(100vh) scale(1);
+      opacity: 1;
+    }
+    100% {
+      transform: translateY(-10vh) scale(1.5);
+      opacity: 0;
+    }
+  }
+
+  /* 🎆 Firework */
+  .firework {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    animation: blast 1.8s ease-out forwards;
+  }
+
+  @keyframes blast {
     0% { transform: translate(0,0) scale(1); opacity: 1; }
-    100% { transform: translate(var(--dx), var(--dy)) scale(0.5); opacity: 0; }
+    100% { transform: translate(var(--dx), var(--dy)) scale(0.2); opacity: 0; }
   }
 </style>
 </head>
+
 <body>
 
 <h1>Will you be my girlfriend? &#10084;&#65039;</h1>
@@ -76,72 +96,84 @@
   <button id="no">NO</button>
 </div>
 
+<!-- Background Music -->
+<audio id="bgMusic" loop>
+  <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+</audio>
+
 <script>
 const noBtn = document.getElementById("no");
 const yesBtn = document.getElementById("yes");
-const container = document.querySelector(".button-container");
-const body = document.body;
+const music = document.getElementById("bgMusic");
 
-// Place buttons below heading (centered horizontally)
-yesBtn.style.left = (window.innerWidth/2 - yesBtn.offsetWidth - 20) + "px";
-yesBtn.style.top = "20px"; // relative to container
-noBtn.style.left = (window.innerWidth/2 + 20) + "px";
-noBtn.style.top = "20px";
+let escapeCount = 0;
+const MAX_ESCAPE = 15;
 
-// NO button full screen teleport + animation
+// Center buttons
+function centerButtons() {
+  yesBtn.style.left = (window.innerWidth / 2 - 120) + "px";
+  yesBtn.style.top = "30px";
+
+  noBtn.style.left = (window.innerWidth / 2 + 20) + "px";
+  noBtn.style.top = "30px";
+}
+centerButtons();
+
+// Floating hearts
+function createHeart() {
+  const heart = document.createElement("div");
+  heart.className = "heart";
+  heart.innerText = "❤️";
+  heart.style.left = Math.random() * window.innerWidth + "px";
+  heart.style.animationDuration = (4 + Math.random() * 3) + "s";
+  document.body.appendChild(heart);
+
+  setTimeout(() => heart.remove(), 7000);
+}
+setInterval(createHeart, 400);
+
+// NO button movement + talking
 function moveNoButton() {
-  const maxX = window.innerWidth - noBtn.offsetWidth;
-  const maxY = window.innerHeight - noBtn.offsetHeight;
+  if (escapeCount >= MAX_ESCAPE) {
+    noBtn.style.left = "-500px";
+    noBtn.style.top = "-500px";
+    return;
+  }
 
-  const x = Math.random() * maxX;
-  const y = Math.random() * maxY;
+  escapeCount++;
+
+  const x = Math.random() * (window.innerWidth - noBtn.offsetWidth);
+  const y = Math.random() * (window.innerHeight - noBtn.offsetHeight);
 
   noBtn.style.left = x + "px";
   noBtn.style.top = y + "px";
-
-  // random rotation + scale
-  const scale = 0.8 + Math.random()*0.4;
-  const rotate = Math.random()*360;
-  noBtn.style.transform = `scale(${scale}) rotate(${rotate}deg)`;
+  noBtn.innerText = ["Pakad ke dikha 😜", "Nahi milega 😆", "Try again 😝"][Math.floor(Math.random()*3)];
 }
 
-// Rapid teleport
-function trickyNo() {
-  for(let i=0; i<5; i++){
-    setTimeout(moveNoButton, i*50);
-  }
-}
+noBtn.addEventListener("mouseover", moveNoButton);
+noBtn.addEventListener("click", moveNoButton);
 
-noBtn.addEventListener("mouseover", trickyNo);
-noBtn.addEventListener("click", trickyNo);
-
-// YES button click fireworks
+// YES button fireworks + music
 yesBtn.addEventListener("click", () => {
-  alert("I knew it 😍❤️");
+  music.play();
 
-  // create lots of firework particles
-  for(let i=0; i<50; i++){
-    const particle = document.createElement("div");
-    particle.classList.add("firework");
-    const x = window.innerWidth/2;
-    const y = window.innerHeight/2;
-    particle.style.left = x + "px";
-    particle.style.top = y + "px";
+  for (let i = 0; i < 120; i++) {
+    const fire = document.createElement("div");
+    fire.className = "firework";
 
-    // random direction
-    const dx = (Math.random()-0.5)*800 + "px";
-    const dy = (Math.random()-0.5)*800 + "px";
-    particle.style.setProperty('--dx', dx);
-    particle.style.setProperty('--dy', dy);
+    fire.style.left = window.innerWidth / 2 + "px";
+    fire.style.top = window.innerHeight / 2 + "px";
 
-    // random color
-    particle.style.background = `hsl(${Math.random()*360}, 100%, 50%)`;
+    fire.style.setProperty("--dx", (Math.random() - 0.5) * 1000 + "px");
+    fire.style.setProperty("--dy", (Math.random() - 0.5) * 1000 + "px");
 
-    body.appendChild(particle);
+    fire.style.background = `hsl(${Math.random()*360}, 100%, 50%)`;
 
-    // remove after animation
-    setTimeout(() => particle.remove(), 1500);
+    document.body.appendChild(fire);
+    setTimeout(() => fire.remove(), 2000);
   }
+
+  alert("I knew it 😍❤️");
 });
 </script>
 
