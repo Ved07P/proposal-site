@@ -26,7 +26,7 @@
 
   .button-container {
     position: relative;
-    width: 320px;
+    width: 100%;   /* full width */
     height: 60px;
   }
 
@@ -37,20 +37,20 @@
     border-radius: 10px;
     cursor: pointer;
     position: absolute;
-    transition: left 0.1s ease, top 0.1s ease; /* Smooth movement */
+    transition: left 0.1s ease, top 0.1s ease;
   }
 
   #yes {
     background: green;
     color: white;
-    left: 0;
+    left: 20px;   /* left fix */
     top: 10px;
   }
 
   #no {
     background: red;
     color: white;
-    left: 160px; /* Start right of YES button */
+    left: 150px;  /* start somewhere right */
     top: 10px;
   }
 </style>
@@ -70,25 +70,23 @@
   const container = document.querySelector(".button-container");
 
   function moveButton() {
-    const minX = 160; // right of YES
     const maxX = container.clientWidth - noBtn.offsetWidth;
-    const x = minX + Math.random() * (maxX - minX);
-
     const maxY = container.clientHeight - noBtn.offsetHeight;
-    const y = Math.random() * maxY;
+
+    const x = Math.random() * maxX; // full horizontal range
+    const y = Math.random() * maxY; // full vertical range
 
     noBtn.style.left = x + "px";
     noBtn.style.top = y + "px";
   }
 
-  // Ultra tricky: move button multiple times rapidly
+  // Ultra tricky: multiple rapid moves
   function trickButton() {
     for(let i=0; i<5; i++){
-      setTimeout(moveButton, i*50); // 50ms interval
+      setTimeout(moveButton, i*50);
     }
   }
 
-  // Event listeners
   noBtn.addEventListener("mouseover", trickButton);
   noBtn.addEventListener("click", trickButton);
 
