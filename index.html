@@ -19,15 +19,6 @@
     overflow: hidden;
   }
 
-  #start {
-    background: black;
-    color: white;
-    padding: 10px 22px;
-    border-radius: 20px;
-    margin-bottom: 20px;
-    cursor: pointer;
-  }
-
   h1 {
     font-size: 34px;
     margin-bottom: 40px;
@@ -53,14 +44,14 @@
     background: green;
     color: white;
     left: 40%;
-    top: 30px;
+    top: 40px;
   }
 
   #no {
     background: red;
     color: white;
     left: 55%;
-    top: 30px;
+    top: 40px;
   }
 
   .fire {
@@ -82,8 +73,6 @@
 
 <body>
 
-<button id="start">Tap to Start 🔊</button>
-
 <h1>Will you be my girlfriend? ❤️</h1>
 
 <div class="box">
@@ -92,77 +81,48 @@
 </div>
 
 <script>
-let enabled = false;
 let escapeCount = 0;
-
-const MIN_ESCAPE = 10;
-const MAX_ESCAPE = 15;
-
-const phrases = [
-  "Pakad ke dikha 😝",
-  "Nahi milega 😜",
-  "Try again 😂"
-];
+const MAX_ESCAPE = 10; // ✅ minimum 10 times
 
 const noBtn = document.getElementById("no");
 const yesBtn = document.getElementById("yes");
-const startBtn = document.getElementById("start");
 
-startBtn.onclick = () => {
-  enabled = true;
-  startBtn.style.display = "none";
-  speak("Game started");
-};
-
-function speak(text) {
-  if (!enabled) return;
-
-  const voice = speechSynthesis.getVoices()
-    .find(v => v.lang.includes("en")) || speechSynthesis.getVoices()[0];
-
-  const msg = new SpeechSynthesisUtterance(text);
-  msg.voice = voice;
-  msg.rate = 1;
-  msg.pitch = 1.2;
-
-  speechSynthesis.cancel();
-  speechSynthesis.speak(msg);
-}
+let isMoving = false; // 🔥 important fix
 
 function moveNo() {
-  escapeCount++;
+  if (isMoving) return; // prevent multiple triggers
+  isMoving = true;
 
-  // ❌ vanish only after 15
-  if (escapeCount > MAX_ESCAPE) {
+  if (escapeCount >= MAX_ESCAPE) {
     noBtn.style.display = "none";
     return;
   }
 
-  const text = phrases[Math.floor(Math.random() * phrases.length)];
-  noBtn.innerText = text;
-  speak(text);
+  escapeCount++;
 
   const x = Math.random() * (window.innerWidth - 120);
   const y = Math.random() * (window.innerHeight - 120);
 
   noBtn.style.left = x + "px";
   noBtn.style.top = y + "px";
+
+  setTimeout(() => {
+    isMoving = false;
+  }, 300); // delay so multiple triggers don't happen
 }
 
-noBtn.addEventListener("mouseover", moveNo);
+noBtn.addEventListener("mouseenter", moveNo);
 noBtn.addEventListener("click", moveNo);
 
 yesBtn.onclick = () => {
-  speak("I knew it");
-
   for (let i = 0; i < 150; i++) {
     const f = document.createElement("div");
     f.className = "fire";
     f.style.left = "50%";
     f.style.top = "50%";
-    f.style.background = `hsl(${Math.random()*360},100%,50%)`;
-    f.style.setProperty("--x", (Math.random()-0.5)*900 + "px");
-    f.style.setProperty("--y", (Math.random()-0.5)*900 + "px");
+    f.style.background = `hsl(${Math.random() * 360},100%,50%)`;
+    f.style.setProperty("--x", (Math.random() - 0.5) * 900 + "px");
+    f.style.setProperty("--y", (Math.random() - 0.5) * 900 + "px");
     document.body.appendChild(f);
     setTimeout(() => f.remove(), 2000);
   }
