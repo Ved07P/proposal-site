@@ -82,16 +82,16 @@
 
 <script>
 let escapeCount = 0;
-const MAX_ESCAPE = 10; // ✅ minimum 10 times
+const MAX_ESCAPE = 10;
+let canMove = true;
 
 const noBtn = document.getElementById("no");
 const yesBtn = document.getElementById("yes");
 
-let isMoving = false; // 🔥 important fix
-
-function moveNo() {
-  if (isMoving) return; // prevent multiple triggers
-  isMoving = true;
+// ONLY ONE EVENT (fix)
+noBtn.addEventListener("pointerenter", () => {
+  if (!canMove) return;
+  canMove = false;
 
   if (escapeCount >= MAX_ESCAPE) {
     noBtn.style.display = "none";
@@ -107,15 +107,12 @@ function moveNo() {
   noBtn.style.top = y + "px";
 
   setTimeout(() => {
-    isMoving = false;
-  }, 300); // delay so multiple triggers don't happen
-}
-
-noBtn.addEventListener("mouseenter", moveNo);
-noBtn.addEventListener("click", moveNo);
+    canMove = true;
+  }, 350);
+});
 
 yesBtn.onclick = () => {
-  for (let i = 0; i < 150; i++) {
+  for (let i = 0; i < 180; i++) {
     const f = document.createElement("div");
     f.className = "fire";
     f.style.left = "50%";
