@@ -3,156 +3,140 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Proposal ❤️</title>
 
 <style>
   body {
     margin: 0;
     height: 100vh;
-    width: 100vw;
+    background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+    font-family: "Segoe UI Emoji", "Apple Color Emoji", sans-serif;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: flex-start;
-    font-family: "Segoe UI Emoji", "Apple Color Emoji", Arial, sans-serif;
-    background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+    justify-content: center;
     overflow: hidden;
   }
 
   h1 {
-    margin-top: 40px;
-    font-size: 3rem;
+    font-size: 32px;
+    margin-bottom: 40px;
     text-align: center;
   }
 
-  .button-container {
+  .box {
     position: relative;
     width: 100%;
-    height: 180px;
-    margin-top: 20px;
+    height: 200px;
   }
 
   button {
-    padding: 14px 30px;
+    padding: 14px 28px;
     font-size: 18px;
     border: none;
-    border-radius: 10px;
+    border-radius: 12px;
     cursor: pointer;
     position: absolute;
-    transition: all 0.25s ease;
   }
 
   #yes {
     background: green;
     color: white;
+    left: 40%;
+    top: 20px;
   }
 
   #no {
     background: red;
     color: white;
+    left: 55%;
+    top: 20px;
   }
 
-  /* 🔥 Floating Hearts */
   .heart {
-    position: absolute;
-    font-size: 24px;
-    animation: float 6s linear infinite;
-    opacity: 0.8;
+    position: fixed;
+    font-size: 25px;
+    animation: float 5s linear forwards;
   }
 
   @keyframes float {
-    0% {
-      transform: translateY(100vh) scale(1);
-      opacity: 1;
-    }
-    100% {
-      transform: translateY(-10vh) scale(1.5);
+    0% { transform: translateY(0); opacity: 1; }
+    100% { transform: translateY(-700px); opacity: 0; }
+  }
+
+  .fire {
+    position: fixed;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    animation: boom 2s linear forwards;
+  }
+
+  @keyframes boom {
+    to {
+      transform: translate(var(--x), var(--y));
       opacity: 0;
     }
   }
 
-  /* 🎆 Firework */
-  .firework {
-    position: absolute;
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    animation: blast 1.8s ease-out forwards;
-  }
-
-  @keyframes blast {
-    0% { transform: translate(0,0) scale(1); opacity: 1; }
-    100% { transform: translate(var(--dx), var(--dy)) scale(0.2); opacity: 0; }
+  #start {
+    position: fixed;
+    bottom: 20px;
+    background: black;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 20px;
   }
 </style>
 </head>
 
 <body>
 
-<h1>Will you be my girlfriend? &#10084;&#65039;</h1>
+<h1>Will you be my girlfriend? ❤️</h1>
 
-<div class="button-container">
+<div class="box">
   <button id="yes">YES</button>
   <button id="no">NO</button>
 </div>
 
-<!-- Background Music -->
-<audio id="bgMusic" loop>
-  <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
-</audio>
+<button id="start">Tap to Start 🔊</button>
 
 <script>
-const noBtn = document.getElementById("no");
-const yesBtn = document.getElementById("yes");
-const music = document.getElementById("bgMusic");
-
+let enabled = false;
 let escapeCount = 0;
-const MAX_ESCAPE = 15;
 
 const phrases = [
-  "Pakad ke dikha",
-  "Nahi milega",
-  "Try again"
+  "Pakad ke dikha 😝",
+  "Nahi milega 😜",
+  "Try again 😂"
 ];
 
-// 🎤 Speak function
+const noBtn = document.getElementById("no");
+const yesBtn = document.getElementById("yes");
+const startBtn = document.getElementById("start");
+
+// Enable sound
+startBtn.onclick = () => {
+  enabled = true;
+  startBtn.style.display = "none";
+  speak("Game started");
+};
+
+// Voice function
 function speak(text) {
+  if (!enabled) return;
   const msg = new SpeechSynthesisUtterance(text);
   msg.lang = "en-IN";
   msg.rate = 1;
-  msg.pitch = 1.2;
-  speechSynthesis.cancel(); // overlapping stop
+  speechSynthesis.cancel();
   speechSynthesis.speak(msg);
 }
 
-// Center buttons
-function centerButtons() {
-  yesBtn.style.left = (window.innerWidth / 2 - 120) + "px";
-  yesBtn.style.top = "30px";
-
-  noBtn.style.left = (window.innerWidth / 2 + 20) + "px";
-  noBtn.style.top = "30px";
-}
-centerButtons();
-
-// Floating hearts
-function createHeart() {
-  const heart = document.createElement("div");
-  heart.className = "heart";
-  heart.innerText = "❤️";
-  heart.style.left = Math.random() * window.innerWidth + "px";
-  heart.style.animationDuration = (4 + Math.random() * 3) + "s";
-  document.body.appendChild(heart);
-
-  setTimeout(() => heart.remove(), 7000);
-}
-setInterval(createHeart, 400);
-
-// NO button movement + voice
-function moveNoButton() {
-  if (escapeCount >= MAX_ESCAPE) {
-    noBtn.style.left = "-500px";
-    noBtn.style.top = "-500px";
+// Move NO button
+function moveNo() {
+  if (escapeCount >= 15) {
+    noBtn.style.display = "none";
     return;
   }
 
@@ -162,38 +146,34 @@ function moveNoButton() {
   noBtn.innerText = text;
   speak(text);
 
-  const x = Math.random() * (window.innerWidth - noBtn.offsetWidth);
-  const y = Math.random() * (window.innerHeight - noBtn.offsetHeight);
+  const x = Math.random() * (window.innerWidth - 120);
+  const y = Math.random() * (window.innerHeight - 120);
 
   noBtn.style.left = x + "px";
   noBtn.style.top = y + "px";
 }
 
-noBtn.addEventListener("mouseover", moveNoButton);
-noBtn.addEventListener("click", moveNoButton);
+noBtn.addEventListener("mouseover", moveNo);
+noBtn.addEventListener("click", moveNo);
 
-// YES button fireworks
-yesBtn.addEventListener("click", () => {
-  music.play();
+// YES fireworks
+yesBtn.onclick = () => {
+  speak("I knew it");
 
-  for (let i = 0; i < 150; i++) {
-    const fire = document.createElement("div");
-    fire.className = "firework";
-
-    fire.style.left = window.innerWidth / 2 + "px";
-    fire.style.top = window.innerHeight / 2 + "px";
-
-    fire.style.setProperty("--dx", (Math.random() - 0.5) * 1000 + "px");
-    fire.style.setProperty("--dy", (Math.random() - 0.5) * 1000 + "px");
-
-    fire.style.background = `hsl(${Math.random()*360}, 100%, 50%)`;
-
-    document.body.appendChild(fire);
-    setTimeout(() => fire.remove(), 2000);
+  for (let i = 0; i < 120; i++) {
+    const f = document.createElement("div");
+    f.className = "fire";
+    f.style.left = "50%";
+    f.style.top = "50%";
+    f.style.background = `hsl(${Math.random()*360},100%,50%)`;
+    f.style.setProperty("--x", (Math.random() - 0.5) * 800 + "px");
+    f.style.setProperty("--y", (Math.random() - 0.5) * 800 + "px");
+    document.body.appendChild(f);
+    setTimeout(() => f.remove(), 2000);
   }
 
   alert("I knew it 😍❤️");
-});
+};
 </script>
 
 </body>
