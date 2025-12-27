@@ -19,8 +19,17 @@
     overflow: hidden;
   }
 
+  #start {
+    background: black;
+    color: white;
+    padding: 10px 22px;
+    border-radius: 20px;
+    margin-bottom: 20px;
+    cursor: pointer;
+  }
+
   h1 {
-    font-size: 32px;
+    font-size: 34px;
     margin-bottom: 40px;
     text-align: center;
   }
@@ -28,7 +37,7 @@
   .box {
     position: relative;
     width: 100%;
-    height: 200px;
+    height: 220px;
   }
 
   button {
@@ -44,25 +53,14 @@
     background: green;
     color: white;
     left: 40%;
-    top: 20px;
+    top: 30px;
   }
 
   #no {
     background: red;
     color: white;
     left: 55%;
-    top: 20px;
-  }
-
-  .heart {
-    position: fixed;
-    font-size: 25px;
-    animation: float 5s linear forwards;
-  }
-
-  @keyframes float {
-    0% { transform: translateY(0); opacity: 1; }
-    100% { transform: translateY(-700px); opacity: 0; }
+    top: 30px;
   }
 
   .fire {
@@ -79,19 +77,12 @@
       opacity: 0;
     }
   }
-
-  #start {
-    position: fixed;
-    bottom: 20px;
-    background: black;
-    color: white;
-    padding: 10px 20px;
-    border-radius: 20px;
-  }
 </style>
 </head>
 
 <body>
+
+<button id="start">Tap to Start 🔊</button>
 
 <h1>Will you be my girlfriend? ❤️</h1>
 
@@ -100,11 +91,12 @@
   <button id="no">NO</button>
 </div>
 
-<button id="start">Tap to Start 🔊</button>
-
 <script>
 let enabled = false;
 let escapeCount = 0;
+
+const MIN_ESCAPE = 10;
+const MAX_ESCAPE = 15;
 
 const phrases = [
   "Pakad ke dikha 😝",
@@ -116,31 +108,35 @@ const noBtn = document.getElementById("no");
 const yesBtn = document.getElementById("yes");
 const startBtn = document.getElementById("start");
 
-// Enable sound
 startBtn.onclick = () => {
   enabled = true;
   startBtn.style.display = "none";
   speak("Game started");
 };
 
-// Voice function
 function speak(text) {
   if (!enabled) return;
+
+  const voice = speechSynthesis.getVoices()
+    .find(v => v.lang.includes("en")) || speechSynthesis.getVoices()[0];
+
   const msg = new SpeechSynthesisUtterance(text);
-  msg.lang = "en-IN";
+  msg.voice = voice;
   msg.rate = 1;
+  msg.pitch = 1.2;
+
   speechSynthesis.cancel();
   speechSynthesis.speak(msg);
 }
 
-// Move NO button
 function moveNo() {
-  if (escapeCount >= 15) {
+  escapeCount++;
+
+  // ❌ vanish only after 15
+  if (escapeCount > MAX_ESCAPE) {
     noBtn.style.display = "none";
     return;
   }
-
-  escapeCount++;
 
   const text = phrases[Math.floor(Math.random() * phrases.length)];
   noBtn.innerText = text;
@@ -156,18 +152,17 @@ function moveNo() {
 noBtn.addEventListener("mouseover", moveNo);
 noBtn.addEventListener("click", moveNo);
 
-// YES fireworks
 yesBtn.onclick = () => {
   speak("I knew it");
 
-  for (let i = 0; i < 120; i++) {
+  for (let i = 0; i < 150; i++) {
     const f = document.createElement("div");
     f.className = "fire";
     f.style.left = "50%";
     f.style.top = "50%";
     f.style.background = `hsl(${Math.random()*360},100%,50%)`;
-    f.style.setProperty("--x", (Math.random() - 0.5) * 800 + "px");
-    f.style.setProperty("--y", (Math.random() - 0.5) * 800 + "px");
+    f.style.setProperty("--x", (Math.random()-0.5)*900 + "px");
+    f.style.setProperty("--y", (Math.random()-0.5)*900 + "px");
     document.body.appendChild(f);
     setTimeout(() => f.remove(), 2000);
   }
