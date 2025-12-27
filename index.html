@@ -27,7 +27,7 @@
   .button-container {
     position: relative;  /* Parent container relative */
     width: 300px;
-    height: 100px;
+    height: 60px;
   }
 
   button {
@@ -43,12 +43,14 @@
     background: green;
     color: white;
     left: 0;
-    top: 30px;
+    top: 10px;
   }
 
   #no {
     background: red;
     color: white;
+    left: 150px; /* Start position right of YES button */
+    top: 10px;
   }
 </style>
 </head>
@@ -67,11 +69,17 @@
   const container = document.querySelector(".button-container");
 
   function moveButton() {
+    // Horizontal movement only, limited range
+    const minX = 150; // right of YES button
     const maxX = container.clientWidth - noBtn.offsetWidth;
-    const maxY = container.clientHeight - noBtn.offsetHeight;
+    const x = minX + Math.random() * (maxX - minX);
 
-    noBtn.style.left = Math.random() * maxX + "px";
-    noBtn.style.top = Math.random() * maxY + "px";
+    // Small vertical movement only
+    const maxY = container.clientHeight - noBtn.offsetHeight;
+    const y = Math.random() * maxY;
+
+    noBtn.style.left = x + "px";
+    noBtn.style.top = y + "px";
   }
 
   noBtn.addEventListener("mouseover", moveButton);
